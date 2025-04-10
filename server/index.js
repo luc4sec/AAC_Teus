@@ -14,7 +14,7 @@ app.use(express.json());
 
 // MongoDB Connection
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { ssl: false});
 const dbName = 'teus_app';
 const collectionName = 'cards';
 
