@@ -19,6 +19,11 @@ const backgroundColor = ref('');
 const textColor = ref('');
 const iconColor = ref('');
 const titleInput = ref<HTMLInputElement | null>(null);
+const showImageSearchModal = ref(false);
+const showExpressiaImageSearchModal = ref(false);
+const imageSearchResults = ref<{ link: string; thumbnailLink?: string }[]>([]);
+const imageSearchQuery = ref('');
+const isSearching = ref(false);
 
 onMounted(() => {
   title.value = props.card.title;
@@ -68,6 +73,64 @@ const handleKeyDown = (event: KeyboardEvent) => {
     emit('close');
   }
 };
+
+const searchImages = async (page = 1) => {
+  if (!imageSearchQuery.value) return;
+  
+  isSearching.value = true;
+  try {
+    const apiKey = "AIzaSyDdlGItp_cjFBfqoB8mtepToa_6D3p-H6Q";
+    const cx = "22223a4a6be2a43bd";
+    const start = (page - 1) * 20 + 1;
+    const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${imageSearchQuery.value}&searchType=image&start=${start}`);
+    const data = await response.json();
+    imageSearchResults.value = data.items.map((item: any) => ({
+      link: item.link,
+      thumbnailLink: item.link
+    }));
+  } catch (error) {
+    console.error('Error searching images:', error);
+  } finally {
+    isSearching.value = false;
+  }
+};
+
+const searchImagesExpressia = async () => {
+  if (!imageSearchQuery.value) return;
+  
+  isSearching.value = true;
+  try {
+    const response = await fetch('https://us-central1-expressia-a2020.cloudfunctions.net/imageSearchV5', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          search_text: imageSearchQuery.value,
+          countryCode: 'br'
+        }
+      })
+    });
+    const data = await response.json();
+    imageSearchResults.value = data.result.items.map((item: any) => ({
+      link: item.link,
+      thumbnailLink: item.image.thumbnailLink
+    }));
+  } catch (error) {
+    console.error('Error searching images:', error);
+  } finally {
+    isSearching.value = false;
+  }
+};
+
+const selectImage = (imageUrl: string) => {
+  icon.value = imageUrl;
+  showImageSearchModal.value = false;
+  showExpressiaImageSearchModal.value = false;
+  imageSearchResults.value = [];
+  imageSearchQuery.value = '';
+};
 </script>
 
 <template>
@@ -109,14 +172,24 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
           <div class="form-group">
             <label for="icon">URL do Ícone:</label>
-            <input
-              id="icon"
-              v-model="icon"
-              type="url"
-              required
-              placeholder="https://api.iconify.design/..."
-              aria-required="true"
-            />
+            <div class="icon-input-wrapper">
+              <input
+                id="icon"
+                v-model="icon"
+                type="url"
+                required
+                placeholder="https://api.iconify.design/..."
+                aria-required="true"
+              />
+              <div class="icon-search-buttons">
+                <button type="button" @click="showImageSearchModal = true" class="search-button">
+                  Buscar no Google
+                </button>
+                <button type="button" @click="showExpressiaImageSearchModal = true" class="search-button">
+                  Buscar no Expressia
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -191,6 +264,75 @@ const handleKeyDown = (event: KeyboardEvent) => {
                   class="color-text"
                   aria-label="Digite o código da cor do ícone"
                 />
+              </div>
+            </div>
+          </div>
+
+          <!-- Google Image Search Modal -->
+          <div v-if="showImageSearchModal" class="image-search-modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3>Buscar Imagens no Google</h3>
+                <button @click="showImageSearchModal = false" class="close-button">×</button>
+              </div>
+              <div class="search-input-wrapper">
+                <input
+                  v-model="imageSearchQuery"
+                  type="text"
+                  placeholder="Digite o que deseja buscar..."
+                  @keyup.enter="searchImages(1)"
+                />
+                <button @click="searchImages(1)" :disabled="isSearching">
+                  {{ isSearching ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+              <div class="image-grid">
+                <div
+                  v-for="(image, index) in imageSearchResults"
+                  :key="index"
+                  class="image-item"
+                  @click="selectImage(image.link)"
+                >
+                  <img :src="image.thumbnailLink || image.link" :alt="'Imagem ' + (index + 1)" />
+                </div>
+              </div>
+              <div class="pagination" v-if="imageSearchResults.length > 0">
+                <button @click="searchImages(1)">1</button>
+                <button @click="searchImages(2)">2</button>
+                <button @click="searchImages(3)">3</button>
+                <button @click="searchImages(4)">4</button>
+                <button @click="searchImages(5)">5</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expressia Image Search Modal -->
+          <div v-if="showExpressiaImageSearchModal" class="image-search-modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3>Buscar Imagens no Expressia</h3>
+                <button @click="showExpressiaImageSearchModal = false" class="close-button">×</button>
+              </div>
+              <div class="search-input-wrapper">
+                <input
+                  v-model="imageSearchQuery"
+                  type="text"
+                  placeholder="Digite o que deseja buscar..."
+                  @keyup.enter="searchImagesExpressia"
+                />
+                <button @click="searchImagesExpressia" :disabled="isSearching">
+                  {{ isSearching ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+              <div class="image-grid">
+                <div
+                  v-for="(image, index) in imageSearchResults"
+                  :key="index"
+                  class="image-item"
+                  @click="selectImage(image.link)"
+                >
+                  <img :src="image.thumbnailLink || image.link" :alt="'Imagem ' + (index + 1)" />
+                </div>
               </div>
             </div>
           </div>
@@ -352,7 +494,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   font-size: 1rem;
   min-width: 80px;
   -webkit-tap-highlight-color: transparent;
-  -webkit-appearance: none; /* Remove Safari default styles */
+  -webkit-appearance: none;
   appearance: none;
   transition: opacity 0.2s ease, background-color 0.2s ease;
 }
@@ -504,5 +646,143 @@ const handleKeyDown = (event: KeyboardEvent) => {
   .dialog-buttons button {
     padding: 0.875rem;
   }
+}
+
+.icon-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.icon-search-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-button {
+  flex: 1;
+  background: #f5f5f5;
+  color: #333;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.search-button:hover {
+  background: #e0e0e0;
+}
+
+.image-search-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.image-search-modal .modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.search-input-wrapper {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input-wrapper input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.search-input-wrapper button {
+  padding: 0.75rem 1.25rem;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-input-wrapper button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-grid {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.image-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pagination {
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background: #e0e0e0;
 }
 </style>

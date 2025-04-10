@@ -264,18 +264,18 @@ const handleKeyDown = (event: KeyboardEvent) => {
 }
 
 .card-icon {
-  width: 60%;
+  width: 80%;
   height: auto;
   margin-bottom: 0.5rem;
   pointer-events: none;
   -webkit-user-drag: none;
-  max-width: 48px;
-  max-height: 48px;
+  max-width: 100px;
+  max-height: 100px;
 }
 
 .card-title {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 600;
   text-align: center;
   margin: 0;
   word-break: break-word;
@@ -337,9 +337,9 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   .card-icon {
-    width: 50%;
-    max-width: 40px;
-    max-height: 40px;
+    width: 70%;
+    max-width: 56px;
+    max-height: 56px;
   }
 
   .card-title {
@@ -369,9 +369,9 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   .card-icon {
-    width: 45%;
-    max-width: 32px;
-    max-height: 32px;
+    width: 65%;
+    max-width: 48px;
+    max-height: 48px;
   }
 
   .card-title {

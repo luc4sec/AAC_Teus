@@ -227,7 +227,12 @@ const handleDrop = async (targetCard: Card, event: DragEvent) => {
           @click="handleBack"
           aria-label="Voltar"
         >
-          ←
+          <img
+            src="https://api.iconify.design/material-symbols:arrow-back.svg"
+            alt="Voltar"
+            width="28"
+            height="28"
+          />
         </button>
 
         <nav class="breadcrumb" aria-label="Navegação">
@@ -344,7 +349,7 @@ main {
   flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-top: 60px; /* Espaço para os controles fixos */
+  padding-top: 64px;
 }
 
 /* Permitir rolagem quando não estiver em modo de edição */
@@ -445,14 +450,15 @@ main:not(.editing) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: #f5f5f5;
+  background: #2196F3;
   z-index: 999;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  height: 64px;
 }
 
 .navigation-left {
@@ -465,7 +471,7 @@ main:not(.editing) {
 }
 
 .grid-container {
-  margin-top: 70px; /* Altura da barra de navegação */
+  margin-top: 10px;
   padding: 1rem;
 }
 
@@ -473,26 +479,27 @@ main:not(.editing) {
   position: static;
   background: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 200ms ease;
+  transition: background-color 200ms ease;
   flex-shrink: 0;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  color: #2196F3;
+  margin-right: 8px;
+}
+
+.back-button img {
+  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(196deg) brightness(96%) contrast(101%);
 }
 
 .back-button:hover {
-  transform: scale(1.1);
-}
-
-.back-button:focus {
-  outline: 2px solid #2196F3;
-  outline-offset: 2px;
+  background-color: #f5f5f5;
 }
 
 .breadcrumb {
@@ -500,44 +507,32 @@ main:not(.editing) {
 }
 
 .breadcrumb-container {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 100px;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0.25rem;
+  box-shadow: none;
   overflow-x: auto;
-  white-space: nowrap;
   -webkit-overflow-scrolling: touch;
-  max-width: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  white-space: nowrap;
 }
 
 .breadcrumb-item {
   background: none;
   border: none;
   padding: 0.25rem 0.5rem;
-  border-radius: 100px;
-  color: #2196F3;
+  font-size: 0.95rem;
   font-weight: 500;
+  color: white;
   cursor: pointer;
-  transition: all 200ms ease;
-}
-
-.breadcrumb-item:hover {
-  background-color: #e3f2fd;
-  transform: translateY(-1px);
-}
-
-.breadcrumb-item:focus {
-  outline: 2px solid #2196F3;
-  outline-offset: 2px;
 }
 
 .breadcrumb-separator {
-  color: #666;
-  font-weight: 300;
-  user-select: none;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0.25rem;
 }
 
 .breadcrumb-container::-webkit-scrollbar {
@@ -585,6 +580,7 @@ main:not(.editing) {
 @media (max-width: 768px) {
   .navigation-container {
     padding: 0.5rem;
+    height: 56px;
   }
 
   .navigation-left {
@@ -592,37 +588,109 @@ main:not(.editing) {
   }
 
   .back-button {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     font-size: 1rem;
   }
 
-  .breadcrumb-container {
-    padding: 0.25rem 0.5rem;
+  .back-button img {
+    width: 24px;
+    height: 24px;
   }
 
   .breadcrumb-item {
     padding: 0.15rem 0.3rem;
     font-size: 0.9rem;
   }
+
+  main {
+    padding-top: 56px;
+  }
+
+  .grid-container {
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
   .navigation-container {
     padding: 0.4rem;
+    height: 56px;
   }
   
   .back-button {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
+    margin-right: 4px;
   }
   
-  .breadcrumb-container {
-    padding: 0.15rem 0.3rem;
+  .back-button img {
+    width: 20px;
+    height: 20px;
   }
   
   .breadcrumb-item {
     font-size: 0.8rem;
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.4rem;
+  }
+}
+
+/* Landscape orientation specific styles */
+@media (max-height: 480px) and (orientation: landscape) {
+  .navigation-container {
+    height: 48px;
+    padding: 0.3rem;
+  }
+
+  main {
+    padding-top: 48px;
+  }
+
+  .back-button {
+    width: 32px;
+    height: 32px;
+    margin-right: 4px;
+  }
+
+  .back-button img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .breadcrumb-item {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.2rem;
+  }
+
+  .grid-container {
+    padding: 0.3rem;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.3rem;
+  }
+}
+
+/* Small screens in landscape */
+@media (max-width: 640px) and (orientation: landscape) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+}
+
+/* Very small screens */
+@media (max-width: 320px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .breadcrumb-item {
+    font-size: 0.7rem;
   }
 }
 </style>

@@ -125,25 +125,46 @@ const handleSpeedChange = (event: Event) => {
 <style scoped>
 .lock-control {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .control-button {
   background: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 300ms ease;
+  transition: background-color 300ms ease;
 }
 
 .control-button:hover {
-  transform: scale(1.1);
+  background-color: #f5f5f5;
+}
+
+.control-button:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.settings-button {
+  background-color: white;
+}
+
+.settings-button img {
+  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(196deg) brightness(96%) contrast(101%);
+}
+
+.lock-button {
+  background-color: white;
+}
+
+.lock-button img {
+  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(196deg) brightness(96%) contrast(101%);
 }
 
 .dialog-overlay {
@@ -231,5 +252,17 @@ const handleSpeedChange = (event: Event) => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .control-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .control-button img {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>
