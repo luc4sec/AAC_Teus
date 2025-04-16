@@ -2,6 +2,8 @@
 
 TEUS é uma aplicação de comunicação alternativa e aumentativa projetada para auxiliar pessoas com dificuldades de comunicação. A aplicação permite a criação, organização e uso de cartões de comunicação de forma intuitiva e personalizável.
 
+> ⚠️ Este código foi criado 98% por Inteligência Artificial (utilizando [bolt.new](https://bolt.new) e [Cursor](https://cursor.so)) com o objetivo de ajudar um conhecido e explorar as capacidades de IA na geração de código funcional e estruturado.
+
 ## Funcionalidades
 
 - **Sistema de Cartões**: Interface baseada em cartões visuais organizados por categorias
