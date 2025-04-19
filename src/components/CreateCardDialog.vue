@@ -71,14 +71,11 @@ const searchImages = async (page = 1) => {
   
   isSearching.value = true;
   try {
-    const apiKey = "AIzaSyDdlGItp_cjFBfqoB8mtepToa_6D3p-H6Q";
-    const cx = "22223a4a6be2a43bd";
-    const start = (page - 1) * 20 + 1;
-    const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${imageSearchQuery.value}&searchType=image&start=${start}`);
+    const response = await fetch(`https://api.arasaac.org/api/pictograms/pt/search/${imageSearchQuery.value}`);
     const data = await response.json();
-    imageSearchResults.value = data.items.map((item: any) => ({
-      link: item.link,
-      thumbnailLink: item.link
+    imageSearchResults.value = data.map((item: any) => ({
+      link: `https://static.arasaac.org/pictograms/${item._id}/${item._id}_300.png`,
+      thumbnailLink: `https://static.arasaac.org/pictograms/${item._id}/${item._id}_300.png`
     }));
   } catch (error) {
     console.error('Error searching images:', error);
@@ -174,7 +171,7 @@ const selectImage = (imageUrl: string) => {
               />
               <div class="icon-search-buttons">
                 <button type="button" @click="showImageSearchModal = true" class="search-button">
-                  Buscar no Google
+                  Buscar no Arasaac
                 </button>
                 <button type="button" @click="showExpressiaImageSearchModal = true" class="search-button">
                   Buscar no Expressia
@@ -262,7 +259,7 @@ const selectImage = (imageUrl: string) => {
           <div v-if="showImageSearchModal" class="image-search-modal">
             <div class="modal-content">
               <div class="modal-header">
-                <h3>Buscar Imagens no Google</h3>
+                <h3>Buscar Imagens no Arasaac</h3>
                 <button @click="showImageSearchModal = false" class="close-button">×</button>
               </div>
               <div class="search-input-wrapper">
@@ -270,9 +267,9 @@ const selectImage = (imageUrl: string) => {
                   v-model="imageSearchQuery"
                   type="text"
                   placeholder="Digite o que deseja buscar..."
-                  @keyup.enter="searchImages(1)"
+                  @keyup.enter="searchImages()"
                 />
-                <button @click="searchImages(1)" :disabled="isSearching">
+                <button @click="searchImages()" :disabled="isSearching">
                   {{ isSearching ? 'Buscando...' : 'Buscar' }}
                 </button>
               </div>
@@ -285,13 +282,6 @@ const selectImage = (imageUrl: string) => {
                 >
                   <img :src="image.thumbnailLink || image.link" :alt="'Imagem ' + (index + 1)" />
                 </div>
-              </div>
-              <div class="pagination" v-if="imageSearchResults.length > 0">
-                <button @click="searchImages(1)">1</button>
-                <button @click="searchImages(2)">2</button>
-                <button @click="searchImages(3)">3</button>
-                <button @click="searchImages(4)">4</button>
-                <button @click="searchImages(5)">5</button>
               </div>
             </div>
           </div>

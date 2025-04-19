@@ -221,7 +221,10 @@ app.post('/api/cards', async (req, res) => {
     // Definir a posição como o próximo número depois do último card
     newCard.position = allCards.length;
     
+    // Inserir o novo card
     await collection.insertOne(newCard);
+    
+    // Retornar o card criado com a posição definida
     res.status(201).json(newCard);
   } catch (error) {
     console.error('Error creating card:', error);

@@ -129,17 +129,23 @@ const handleCreateCard = async (newCard: Omit<Card, 'id'>) => {
     ? navigationPath.value[navigationPath.value.length - 1]?.id
     : undefined;
 
+  // Criar o card no servidor
   const createdCard = await saveCard(newCard, parentId);
   
-  // Após criar o card, recarregar os cards atuais
+  // Após criar o card, garantir que os cards sejam recarregados corretamente
   if (history.value.length > 0) {
     // Recarregar subcards do card atual
     const parentCard = navigationPath.value[navigationPath.value.length - 1];
     const subcards = await loadSubcards(parentCard.id);
     currentCards.value = subcards;
   } else {
-    // Se estiver no nível raiz, atualizar os cards principais
-    currentCards.value = [...currentCards.value, createdCard];
+    // Se estiver no nível raiz, atualizar os cards principais carregando tudo novamente
+    // Isso garante que todos os cards tenham suas posições atualizadas
+    const updatedCards = await reorderCards(createdCard.id, currentCards.value.length - 1);
+    if (updatedCards) {
+      // Usar os cards retornados pelo servidor, que já terão posições definidas
+      currentCards.value = updatedCards;
+    }
   }
 
   showCreateDialog.value = false;

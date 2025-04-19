@@ -116,7 +116,7 @@ export function useCards() {
       });
       
       // Atualizar cache em todos os níveis
-      const updateCache = (cards: Card[]) => {
+      const updateCache = (cards: Card[]): Card[] => {
         return cards.filter(c => c.id !== cardId).map(card => {
           if (card.subcards) {
             return {
@@ -167,7 +167,7 @@ export function useCards() {
     }
   }
 
-  const reorderCards = async (cardId: string, targetPosition: number, parentId?: string) => {
+  const reorderCards = async (cardId: string, targetPosition: number, parentId?: string): Promise<Card[]> => {
     loading.value = true;
     error.value = null;
     
@@ -188,21 +188,26 @@ export function useCards() {
       
       console.log('Cards reordenados recebidos do backend:', updatedCards.map((c: Card) => ({ id: c.id, position: c.position, title: c.title })));
       
-      // Atualizar cache
+      // Atualizar cache e o state reativo
       if (!parentId) {
+        // Se for cards do nível raiz, atualizar o array principal e o cache
         cards.value = updatedCards;
         cardCache.set('root', updatedCards);
         return updatedCards;
       } else {
+        // Se for subcards, atualizar apenas o cache do parentId
         cardCache.set(parentId, updatedCards);
         return updatedCards;
       }
+    } catch (error) {
+      console.error('Error reordering cards:', error);
+      throw error;
     } finally {
       loading.value = false;
     }
   }
 
-  const reorderNestedCards = async (cardId: string, targetPosition: number, parentPath: string[]) => {
+  const reorderNestedCards = async (cardId: string, targetPosition: number, parentPath: string[]): Promise<Card[]> => {
     loading.value = true;
     error.value = null;
     
