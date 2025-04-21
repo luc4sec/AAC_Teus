@@ -24,6 +24,8 @@ const showExpressiaImageSearchModal = ref(false);
 const imageSearchResults = ref<{ link: string; thumbnailLink?: string }[]>([]);
 const imageSearchQuery = ref('');
 const isSearching = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
+const uploadedImage = ref<string | null>(null);
 
 onMounted(() => {
   title.value = props.card.title;
@@ -128,6 +130,26 @@ const selectImage = (imageUrl: string) => {
   imageSearchResults.value = [];
   imageSearchQuery.value = '';
 };
+
+const handleFileUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) return;
+  
+  const file = input.files[0];
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    const result = e.target?.result as string;
+    uploadedImage.value = result;
+    icon.value = result; // Atualiza diretamente o ícone com a imagem carregada
+  };
+  
+  reader.readAsDataURL(file);
+};
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
 </script>
 
 <template>
@@ -185,6 +207,20 @@ const selectImage = (imageUrl: string) => {
                 <button type="button" @click="showExpressiaImageSearchModal = true" class="search-button">
                   Buscar no Expressia
                 </button>
+                <button type="button" @click="triggerFileInput" class="search-button">
+                  Upload de Imagem
+                </button>
+                <input 
+                  ref="fileInput"
+                  type="file" 
+                  accept="image/*" 
+                  style="display: none;"
+                  @change="handleFileUpload"
+                />
+              </div>
+              <div v-if="uploadedImage" class="icon-preview">
+                <img :src="uploadedImage" alt="Imagem carregada" />
+                <div class="preview-info">Imagem carregada com sucesso!</div>
               </div>
             </div>
           </div>
@@ -753,5 +789,25 @@ const selectImage = (imageUrl: string) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.icon-preview {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-preview img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.preview-info {
+  color: #2196F3;
+  font-size: 0.9rem;
 }
 </style>
