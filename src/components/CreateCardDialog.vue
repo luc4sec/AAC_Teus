@@ -43,7 +43,11 @@ const handleSubmit = () => {
     return;
   }
 
+  // Gerar ID único usando timestamp e random string
+  const uniqueId = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   const newCard = {
+    id: uniqueId,
     title: title.value,
     icon: icon.value,
     category: props.currentCategory,
@@ -51,6 +55,8 @@ const handleSubmit = () => {
     backgroundColor: backgroundColor.value || undefined,
     textColor: textColor.value || undefined,
     iconColor: iconColor.value || undefined,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   // Emit the create event

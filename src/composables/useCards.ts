@@ -65,7 +65,11 @@ export function useCards() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(card),
+        body: JSON.stringify({
+          ...card,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }),
       });
       
       // Limpar o cache para forçar recarregamento
@@ -82,12 +86,17 @@ export function useCards() {
     error.value = null;
     
     try {
+      const cardToUpdate = {
+        ...updatedCard,
+        updatedAt: new Date().toISOString()
+      };
+
       await fetchAPI(`${API_URL}/cards/${updatedCard.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedCard),
+        body: JSON.stringify(cardToUpdate),
       });
       
       // Atualizar cache
@@ -95,7 +104,7 @@ export function useCards() {
       if (rootCards) {
         const index = rootCards.findIndex(c => c.id === updatedCard.id);
         if (index !== -1) {
-          rootCards[index] = updatedCard;
+          rootCards[index] = cardToUpdate;
           cardCache.set('root', rootCards);
         }
       }

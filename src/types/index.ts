@@ -8,6 +8,8 @@ export interface Card {
   textColor?: string;
   iconColor?: string;
   position?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {

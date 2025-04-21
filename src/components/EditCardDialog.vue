@@ -67,6 +67,7 @@ const handleSubmit = () => {
     backgroundColor: backgroundColor.value !== props.card.category.color ? backgroundColor.value : undefined,
     textColor: textColor.value || undefined,
     iconColor: iconColor.value || undefined,
+    updatedAt: new Date().toISOString()
   };
 
   // Emit the update event
