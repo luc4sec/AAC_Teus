@@ -29,8 +29,6 @@ export function useCards() {
 
   // Carregar cards iniciais
   const loadInitialCards = async () => {
-    if (loading.value) return;
-    
     loading.value = true;
     error.value = null;
     
@@ -153,11 +151,6 @@ export function useCards() {
     error.value = null;
     
     try {
-      const cachedSubcards = cardCache.get(parentId);
-      if (cachedSubcards) {
-        return cachedSubcards;
-      }
-
       const subcards = await fetchAPI(`${API_URL}/cards/${parentId}/subcards`);
       console.log('Subcards recebidos do backend:', subcards.map((c: Card) => ({ id: c.id, position: c.position, title: c.title })));
       cardCache.set(parentId, subcards);
@@ -246,6 +239,8 @@ export function useCards() {
     deleteCard,
     loadSubcards,
     reorderCards,
-    reorderNestedCards
+    reorderNestedCards,
+    cardCache,
+    loadInitialCards
   }
 }

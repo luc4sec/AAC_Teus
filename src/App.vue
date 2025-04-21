@@ -15,7 +15,9 @@ const {
   deleteCard, 
   loadSubcards, 
   loading,
-  reorderCards 
+  reorderCards,
+  loadInitialCards,
+  cardCache
 } = useCards();
 
 const { 
@@ -122,6 +124,32 @@ const handleNavigate = (index: number) => {
 
 const handleEditModeChange = (editing: boolean) => {
   isEditing.value = editing;
+};
+
+const handleReload = () => {
+  loading.value = true;
+  // Recarrega os cards da categoria atual
+  if (history.value.length > 0) {
+    // Se estiver em uma subcategoria, recarrega os subcards
+    const parentCard = navigationPath.value[navigationPath.value.length - 1];
+    loadSubcards(parentCard.id)
+      .then(subcards => {
+        currentCards.value = subcards;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  } else {
+    // Se estiver no nível raiz, recarrega todos os cards
+    cardCache.clear(); // Limpa o cache para forçar recarregamento
+    loadInitialCards()
+      .then(() => {
+        currentCards.value = mainCards.value;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  }
 };
 
 const handleCreateCard = async (newCard: Omit<Card, 'id'>) => {
@@ -264,7 +292,10 @@ const handleDrop = async (targetCard: Card, event: DragEvent) => {
         </nav>
       </div>
       
-      <LockControl @edit-mode-change="handleEditModeChange" />
+      <LockControl 
+        @edit-mode-change="handleEditModeChange" 
+        @reload="handleReload"
+      />
     </div>
 
     <div v-if="loading" class="loading-indicator" role="status" aria-live="polite">

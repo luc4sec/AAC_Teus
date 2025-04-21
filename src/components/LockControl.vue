@@ -4,6 +4,7 @@ import { useSpeech } from '../composables/useSpeech';
 
 const emit = defineEmits<{
   (e: 'editModeChange', isEditing: boolean): void;
+  (e: 'reload'): void;
 }>();
 
 const showPasswordDialog = ref(false);
@@ -42,10 +43,27 @@ const handleSpeedChange = (event: Event) => {
   const value = (event.target as HTMLInputElement).value;
   setSpeechRate(parseFloat(value));
 };
+
+const handleReload = () => {
+  emit('reload');
+};
 </script>
 
 <template>
   <div class="lock-control">
+    <button
+      class="control-button reload-button"
+      @click="handleReload"
+      aria-label="Recarregar"
+    >
+      <img
+        src="https://api.iconify.design/material-symbols:refresh.svg"
+        alt="Recarregar"
+        width="24"
+        height="24"
+      />
+    </button>
+
     <button
       class="control-button settings-button"
       @click="showSettingsDialog = true"
@@ -151,18 +169,14 @@ const handleSpeedChange = (event: Event) => {
   outline-offset: 2px;
 }
 
-.settings-button {
-  background-color: white;
-}
-
-.settings-button img {
-  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(196deg) brightness(96%) contrast(101%);
-}
-
+.reload-button,
+.settings-button,
 .lock-button {
   background-color: white;
 }
 
+.reload-button img,
+.settings-button img,
 .lock-button img {
   filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(196deg) brightness(96%) contrast(101%);
 }
