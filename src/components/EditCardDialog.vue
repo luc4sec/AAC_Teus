@@ -59,7 +59,7 @@ const handleSubmit = () => {
     return;
   }
 
-  emit('update', {
+  const updatedCard = {
     ...props.card,
     title: title.value,
     icon: icon.value,
@@ -67,7 +67,24 @@ const handleSubmit = () => {
     backgroundColor: backgroundColor.value !== props.card.category.color ? backgroundColor.value : undefined,
     textColor: textColor.value || undefined,
     iconColor: iconColor.value || undefined,
-  });
+  };
+
+  // Emit the update event
+  emit('update', updatedCard);
+
+  // Reset form
+  title.value = '';
+  icon.value = '';
+  isGroup.value = false;
+  backgroundColor.value = '';
+  textColor.value = '';
+  iconColor.value = '';
+  uploadedImage.value = null;
+
+  // Close dialog after a small delay to ensure the form is reset
+  setTimeout(() => {
+    emit('close');
+  }, 100);
 };
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -139,9 +156,47 @@ const handleFileUpload = (event: Event) => {
   const reader = new FileReader();
   
   reader.onload = (e) => {
-    const result = e.target?.result as string;
-    uploadedImage.value = result;
-    icon.value = result; // Atualiza diretamente o ícone com a imagem carregada
+    const img = new Image();
+    img.onload = () => {
+      // Create canvas for resizing
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Set maximum dimensions
+      const MAX_WIDTH = 300;
+      const MAX_HEIGHT = 300;
+      
+      // Calculate new dimensions while maintaining aspect ratio
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      
+      // Set canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress image
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // Convert to base64 with quality compression
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      
+      uploadedImage.value = compressedBase64;
+      icon.value = compressedBase64;
+    };
+    
+    img.src = e.target?.result as string;
   };
   
   reader.readAsDataURL(file);
