@@ -2,12 +2,15 @@
 import { ref, computed } from 'vue';
 import EditCardDialog from './EditCardDialog.vue';
 import DeleteConfirmDialog from './DeleteConfirmDialog.vue';
+import CopyMoveDialog from './CopyMoveDialog.vue';
 import { useSpeech } from '../composables/useSpeech';
 import type { Card } from '../types';
 
 const props = defineProps<{
   card: Card;
   isEditing: boolean;
+  currentCards: Card[];
+  history: Card[][];
 }>();
 
 const emit = defineEmits<{
@@ -18,10 +21,12 @@ const emit = defineEmits<{
   (e: 'dragend', event: DragEvent): void;
   (e: 'dragover', event: DragEvent): void;
   (e: 'drop', event: DragEvent): void;
+  (e: 'copy', card: Card, targetCard: Card): void;
 }>();
 
 const showEditDialog = ref(false);
 const showDeleteDialog = ref(false);
+const showCopyMoveDialog = ref(false);
 const isDragging = ref(false);
 const touchStartX = ref(0);
 const touchStartY = ref(0);
@@ -76,6 +81,14 @@ const handleConfirmDelete = () => {
 const handleUpdate = (updatedCard: Card) => {
   emit('update', updatedCard);
   showEditDialog.value = false;
+};
+
+const handleCopyMove = () => {
+  showCopyMoveDialog.value = true;
+};
+
+const handleCopy = (card: Card, targetCard: Card) => {
+  emit('copy', card, targetCard);
 };
 
 // Touch event handlers
@@ -179,6 +192,19 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
     <div v-if="isEditing" class="edit-controls">
       <button
+        class="control-button copy-move-button"
+        @click="handleCopyMove"
+        aria-label="Copiar ou mover item"
+      >
+        <img
+          src="https://api.iconify.design/material-symbols:content-copy.svg"
+          alt="Copiar/Mover"
+          width="16"
+          height="16"
+          aria-hidden="true"
+        />
+      </button>
+      <button
         class="control-button edit-button"
         @click="handleEdit"
         aria-label="Editar item"
@@ -218,6 +244,15 @@ const handleKeyDown = (event: KeyboardEvent) => {
       :card="card"
       @close="showDeleteDialog = false"
       @confirm="handleConfirmDelete"
+    />
+
+    <CopyMoveDialog
+      :show="showCopyMoveDialog"
+      :card="card"
+      :current-cards="currentCards"
+      :history="history"
+      @close="showCopyMoveDialog = false"
+      @copy="handleCopy"
     />
   </div>
 </template>
@@ -329,6 +364,15 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 .delete-button:hover {
   background: #D32F2F;
+}
+
+.copy-move-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.copy-move-button:hover {
+  background: #388E3C;
 }
 
 @media (max-width: 768px) {

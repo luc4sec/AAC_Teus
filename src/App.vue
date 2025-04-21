@@ -17,7 +17,8 @@ const {
   loading,
   reorderCards,
   loadInitialCards,
-  cardCache
+  cardCache,
+  copyCard
 } = useCards();
 
 const { 
@@ -249,6 +250,16 @@ const handleDrop = async (targetCard: Card, event: DragEvent) => {
     }
   }
 };
+
+const handleCopyCard = async (card: Card, targetCard: Card) => {
+  try {
+    await copyCard(card, targetCard);
+    // Recarregar os cards após a cópia
+    await loadInitialCards();
+  } catch (error) {
+    console.error('Erro ao copiar card:', error);
+  }
+};
 </script>
 
 <template>
@@ -314,6 +325,8 @@ const handleDrop = async (targetCard: Card, event: DragEvent) => {
         :card="card"
         :is-editing="isEditing"
         :draggable="isEditing"
+        :current-cards="currentCards"
+        :history="history"
         @select="handleCardSelect"
         @update="handleUpdateCard"
         @delete="handleDeleteCard"
@@ -321,6 +334,7 @@ const handleDrop = async (targetCard: Card, event: DragEvent) => {
         @dragend="handleDragEnd"
         @dragover="handleDragOver"
         @drop="handleDrop(card, $event)"
+        @copy="handleCopyCard"
       />
       
       <button

@@ -239,6 +239,125 @@ export function useCards() {
     }
   }
 
+  const copyCard = async (card: Card, targetCard: Card): Promise<Card> => {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      // Função auxiliar para copiar um card e seus subcards
+      const copyCardAndSubcards = async (cardToCopy: Card): Promise<Card> => {
+        // Gerar novo ID para o card
+        const newId = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Criar cópia do card
+        const copiedCard = {
+          ...cardToCopy,
+          id: newId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        // Se o card tiver subcards, copiar cada um deles
+        if (cardToCopy.subcards) {
+          copiedCard.subcards = await Promise.all(
+            cardToCopy.subcards.map(copyCardAndSubcards)
+          );
+        }
+        
+        return copiedCard;
+      };
+      
+      // Copiar o card e seus subcards
+      const copiedCard = await copyCardAndSubcards(card);
+      
+      // Adicionar o card copiado como subcard do card de destino
+      const updatedTargetCard = {
+        ...targetCard,
+        subcards: [...(targetCard.subcards || []), copiedCard],
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Atualizar o card de destino no backend
+      await fetchAPI(`${API_URL}/cards/${targetCard.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedTargetCard),
+      });
+      
+      // Limpar o cache para forçar recarregamento
+      cardCache.clear();
+      
+      return copiedCard;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const moveCard = async (card: Card, targetCard: Card): Promise<void> => {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      // Encontrar o card pai do card que está sendo movido
+      const findParentCard = (cards: Card[], targetId: string): Card | null => {
+        for (const currentCard of cards) {
+          if (currentCard.subcards) {
+            if (currentCard.subcards.some(c => c.id === targetId)) {
+              return currentCard;
+            }
+            const found = findParentCard(currentCard.subcards, targetId);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      
+      // Encontrar o card pai
+      const parentCard = findParentCard(cards.value, card.id);
+      
+      if (parentCard) {
+        // Remover o card do pai atual
+        const updatedParentCard = {
+          ...parentCard,
+          subcards: parentCard.subcards?.filter(c => c.id !== card.id),
+          updatedAt: new Date().toISOString()
+        };
+        
+        // Atualizar o card pai no backend
+        await fetchAPI(`${API_URL}/cards/${parentCard.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedParentCard),
+        });
+      }
+      
+      // Adicionar o card ao novo pai
+      const updatedTargetCard = {
+        ...targetCard,
+        subcards: [...(targetCard.subcards || []), card],
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Atualizar o card de destino no backend
+      await fetchAPI(`${API_URL}/cards/${targetCard.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedTargetCard),
+      });
+      
+      // Limpar o cache para forçar recarregamento
+      cardCache.clear();
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     cards,
     loading,
@@ -250,6 +369,8 @@ export function useCards() {
     reorderCards,
     reorderNestedCards,
     cardCache,
-    loadInitialCards
+    loadInitialCards,
+    copyCard,
+    moveCard
   }
 }
