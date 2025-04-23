@@ -49,6 +49,13 @@ const iconStyle = computed(() => ({
   filter: props.card.iconColor ? `drop-shadow(0 0 0 ${props.card.iconColor})` : 'none',
 }));
 
+const groupIcon = computed(() => {
+  if (props.card.subcards) {
+    return 'https://api.iconify.design/material-symbols:ad-group-outline-rounded.svg';
+  }
+  return 'https://api.iconify.design/material-symbols:ad.svg';
+});
+
 const handleClick = (event: MouseEvent) => {
   const isContentClick = (event.target as HTMLElement).closest('.card-content') !== null;
   
@@ -187,6 +194,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
           height="48"
         />
         <h2 class="card-title" :style="textStyle">{{ card.title }}</h2>
+        <div class="group-indicator">
+          <img
+            :src="groupIcon"
+            :alt="card.subcards ? 'Grupo' : 'Item único'"
+            width="16"
+            height="16"
+          />
+        </div>
       </div>
     </button>
 
@@ -296,6 +311,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   align-items: center;
   justify-content: space-between;
   gap: 0.15rem;
+  position: relative;
 }
 
 .card-icon {
@@ -385,6 +401,27 @@ const handleKeyDown = (event: KeyboardEvent) => {
   background: #388E3C;
 }
 
+.group-indicator {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  padding: 2px;
+  z-index: 1;
+}
+
+.group-indicator img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 @media (max-width: 768px) {
   .card {
     padding: 0.15rem;
@@ -393,6 +430,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
   .card-title {
     font-size: 0.8rem;
     min-height: 18px;
+  }
+
+  .group-indicator {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -404,6 +446,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
   .card-title {
     font-size: 0.75rem;
     min-height: 16px;
+  }
+
+  .group-indicator {
+    width: 12px;
+    height: 12px;
   }
 }
 
