@@ -275,10 +275,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
 .card {
   width: 100%;
   height: 100%;
-  padding: 0.75rem;
+  padding: 0.2rem;
   box-sizing: border-box;
   transition: transform 0.2s ease, opacity 0.2s ease;
-  border: none;
+  border: 1px solid v-bind('card.backgroundColor || card.category.color');
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -294,27 +294,37 @@ const handleKeyDown = (event: KeyboardEvent) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 0.15rem;
 }
 
 .card-icon {
-  width: 80%;
+  width: 100%;
   height: auto;
-  margin-bottom: 0.5rem;
+  margin: 0;
   pointer-events: none;
   -webkit-user-drag: none;
-  max-width: 100px;
-  max-height: 100px;
+  max-width: none;
+  max-height: calc(100% - 24px);
+  object-fit: contain;
 }
 
 .card-title {
-  font-size: 1.3rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-align: center;
   margin: 0;
   word-break: break-word;
   hyphens: auto;
+  color: v-bind('card.textColor || "#000000"');
+  padding: 0.15rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  width: 100%;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-controls {
@@ -377,49 +387,23 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 @media (max-width: 768px) {
   .card {
-    padding: 0.5rem;
-  }
-
-  .card-icon {
-    width: 70%;
-    max-width: 56px;
-    max-height: 56px;
+    padding: 0.15rem;
   }
 
   .card-title {
-    font-size: 0.9rem;
-  }
-
-  .control-button {
-    width: 32px;
-    height: 32px;
-  }
-
-  .control-button img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .edit-controls {
-    top: -10px;
-    right: -10px;
-    gap: 6px;
+    font-size: 0.8rem;
+    min-height: 18px;
   }
 }
 
 @media (max-width: 480px) {
   .card {
-    padding: 0.4rem;
-  }
-
-  .card-icon {
-    width: 65%;
-    max-width: 48px;
-    max-height: 48px;
+    padding: 0.1rem;
   }
 
   .card-title {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    min-height: 16px;
   }
 }
 
