@@ -21,9 +21,6 @@ services:
     container_name: teus_app_server
     ports:
       - "5000:5000"
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/teus_app
-      - PORT=5000
     depends_on:
       - mongodb
     restart: unless-stopped
@@ -37,9 +34,7 @@ services:
     container_name: teus_app_frontend
     ports:
       - "5173:5173"
-    environment:
-      # - VITE_API_URL=https://teus-api.venox.com.br/api
-      - VITE_API_URL=http://10.1.10.230:5000/api
+
     depends_on:
       - server
     restart: unless-stopped
