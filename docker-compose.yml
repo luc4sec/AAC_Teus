@@ -10,7 +10,7 @@ services:
       - mongodb_data:/data/db
     environment:
       - MONGO_INITDB_DATABASE=teus_app
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
 
@@ -23,7 +23,7 @@ services:
       - "5000:5000"
     depends_on:
       - mongodb
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
 
@@ -34,10 +34,9 @@ services:
     container_name: teus_app_frontend
     ports:
       - "5173:5173"
-
     depends_on:
       - server
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
 
